@@ -8,35 +8,34 @@ const createTriangularNumberGenerator = function() {
     }
 }
 
-const isAnyMoreFactorRemaining = function(factors, divisor) {
-    return !factors.includes(divisor);
-}
-
 const isDivisble = function(candidateNumber, divisor) {
     return candidateNumber%divisor === 0
 }
 
-const getAllFactors = function(candidateNumber) {
-    let result = [];
-    result.push(1, candidateNumber);
-    let reducingNumber = 1;
-    let isCandidateNumberOdd = !isDivisble(candidateNumber, 2);
-    if(isCandidateNumberOdd) {
-        reducingNumber = 2;
-    }
-    let divisor = Math.floor(candidateNumber/2);
-    if(isCandidateNumberOdd && isDivisble(divisor, 2)) {
-        divisor--;
+const isOdd = number => !(number%2 === 0)
+const isPerfectSquare = number => { 
+    let roundsqrt = Math.floor(Math.sqrt(number));
+    return Math.pow(roundsqrt, 2) === number;
+}
+
+const getNumberOfFactors = function(candidateNumber) {
+    let result = 2;
+    let increment = 1;
+    let divisor = 2;
+    if(isOdd(candidateNumber)) {
+        increment = 2;
+        divisor = 3;
     }
 
-    while(isAnyMoreFactorRemaining(result, divisor) && divisor > 0) {
+    while(divisor <= Math.sqrt(candidateNumber)) {
         if(isDivisble(candidateNumber, divisor) ) {
-            result.push(divisor);
-            if(divisor !== candidateNumber/divisor) {
-                result.push(candidateNumber/divisor);
-            }
+            result = result+2;
         }
-        divisor = divisor - reducingNumber;
+        divisor = divisor + increment;
+    }
+
+    if(isPerfectSquare(candidateNumber)) {
+        result--;
     }
     return result;
 }
@@ -47,13 +46,10 @@ const getNumber = function(requiredNumberOfFactors) {
     let isNumberFound = false
     while(!isNumberFound) {
         triangularNumber = getNextTriangularNumber();
-        console.log(triangularNumber);
-        let factors = getAllFactors(triangularNumber);
-        isNumberFound = factors.length >= requiredNumberOfFactors;
+        let numberOfFactors = getNumberOfFactors(triangularNumber);
+        isNumberFound = numberOfFactors >= requiredNumberOfFactors;
     }
     return triangularNumber;
 }
 
-console.log(getAllFactors(2116085));
-
-module.exports = { createTriangularNumberGenerator, getAllFactors, getNumber };
+module.exports = { createTriangularNumberGenerator, getNumberOfFactors, getNumber };
